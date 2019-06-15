@@ -1,0 +1,31 @@
+version: '3'
+services:
+  person:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: dockerize -wait tcp://broker:5672 -wait tcp://db:5432 -timeout 60s python main.py
+    environment:
+      RDBMS_URL: "postgres://postgres:postgres@db/postgres"
+      AMQP_URL: "amqp://guest:guest@broker:5672/"
+      AMQP_EXCHANGE: event_dispatcher
+      AMQP_QUEUE: person
+    depends_on:
+      - broker
+      - db
+    links:
+     - db
+     - broker
+    volumes:
+     - ./person:/app
+    hostname: person
+    ports:
+      - "80:80"
+  db:
+    image: postgres:latest
+    ports:
+      - "5432:5432"
+  broker:
+    image: rabbitmq:3.7-management
+    ports:
+      - "15672:15672"
