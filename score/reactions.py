@@ -85,7 +85,7 @@ def receive_after_flush(session, flush_context):
 
         logger.info(f'Seding to RabbitMQ {obj}.')
 
-        send_message(obj.event_name, obj.as_json)
+        send_message(f'{obj.event_name}.new', obj.as_json)
 
 
 @event.listens_for(Debt, 'before_insert')
