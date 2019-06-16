@@ -2,7 +2,8 @@ from flask import Flask, jsonify
 import logging
 from gevent.pywsgi import WSGIServer
 from flask import request
-from models import Person, person_schema, asset_schema, Score
+from models import (Person, Score, person_schema,
+                    asset_schema, income_schema)
 from sqlalchemy import func
 from sqlalchemy.orm.exc import NoResultFound
 from marshmallow import ValidationError
@@ -34,6 +35,31 @@ def new_asset(cpf):
             asset.person = person
 
             s.add(asset)
+    except NoResultFound:
+        return jsonify({'message': f'Person with CPF {cpf} could not be found.'}), 400
+    except ValidationError as err:
+        return jsonify(err.messages), 422
+
+    return jsonify({'message': 'created'}), 201
+
+
+@app.route('/<int:cpf>/income', methods=['POST'])
+def new_income(cpf):
+    json_data = request.get_json()
+    if not json_data:
+        return jsonify({'message': 'No input data provided'}), 400
+
+    try:
+        with session_scope() as s:
+            person = s.query(Person).filter_by(cpf=cpf).one()
+
+            loaded = income_schema.load(json_data)
+
+            income = loaded.data
+
+            income.person = person
+
+            s.add(income)
     except NoResultFound:
         return jsonify({'message': f'Person with CPF {cpf} could not be found.'}), 400
     except ValidationError as err:

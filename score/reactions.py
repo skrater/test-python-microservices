@@ -5,7 +5,8 @@ import json
 import decimal
 from datetime import date
 from models import (person_schema, debt_schema,
-                    Person, Debt, Asset, Score)
+                    Person, Debt, Asset, Score,
+                    Income)
 from managers import ScoreManager
 from sqlalchemy.orm.exc import NoResultFound
 import logging
@@ -93,8 +94,7 @@ def receive_before_insert_debt(mapper, connection, debt):
 
     @event.listens_for(get_session(), "after_flush", once=True)
     def receive_after_flush(session, context):
-        ScoreManager.inc_score(session, debt.person, -5)
-
+        ScoreManager.inc_score(session, debt.person, -(debt.value // 50))
 
 
 @event.listens_for(Asset, 'before_insert')
@@ -103,4 +103,13 @@ def receive_before_insert_asset(mapper, connection, asset):
 
     @event.listens_for(get_session(), "after_flush", once=True)
     def receive_after_flush(session, context):
-        ScoreManager.inc_score(session, asset.person, 5)
+        ScoreManager.inc_score(session, asset.person, (asset.value // 20))
+
+
+@event.listens_for(Income, 'before_insert')
+def receive_before_insert_asset(mapper, connection, income):
+    logger.info(f'After insert income {income}.')
+
+    @event.listens_for(get_session(), "after_flush", once=True)
+    def receive_after_flush(session, context):
+        ScoreManager.inc_score(session, income.person, (income.value // 50))

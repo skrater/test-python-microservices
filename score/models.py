@@ -22,6 +22,7 @@ class Person(Base):
     debt = relationship('Debt', back_populates='person')
     asset = relationship('Asset', back_populates='person')
     score = relationship('Score', back_populates='person')
+    income = relationship('Income', back_populates='person')
 
     __table_args__ = (UniqueConstraint('cpf'),
                      )
@@ -50,7 +51,7 @@ class PersonSchema(Schema):
         return Person(**data)
 
 
-person_schema = PersonSchema()
+person_schema = PersonSchema(strict=True)
 
 
 class Debt(Base):
@@ -167,3 +168,43 @@ class AssetSchema(Schema):
 
 
 asset_schema = AssetSchema(strict=True)
+
+
+class Income(Base):
+    __tablename__ = 'income'
+
+    id = Column(Integer, primary_key=True)
+    person_id = Column(Integer, ForeignKey('person.id'))
+    type = Column(String)
+    value = Column(Float)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    person = relationship('Person', back_populates='income')
+
+    def __repr__(self):
+        return f'<Income(type={self.type},value={self.value})>'
+
+    @property
+    def as_json(self):
+        return income_schema.dump(self).data
+
+    @property
+    def event_name(self):
+        return 'income'
+
+
+class IncomeSchema(Schema):
+    id = fields.Int(dump_only=True)
+    person_id = fields.Int(dump_only=True)
+    type = fields.String(required=True)
+    value = fields.Float(required=True)
+    created_at = fields.DateTime(dump_only=True)
+
+    person = fields.Nested(PersonSchema, dump_only=True)
+
+    @post_load
+    def make_income(self, data, **kwargs):
+        return Income(**data)
+
+
+income_schema = IncomeSchema(strict=True)
