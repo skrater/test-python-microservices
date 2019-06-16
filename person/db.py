@@ -1,5 +1,6 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from contextlib import contextmanager
 from models import Base
 import logging
 import settings
@@ -34,3 +35,16 @@ def get_session():
 
 def new_session():
 	return get_session()()
+
+
+@contextmanager
+def session_scope():
+    s = new_session()
+    try:
+        yield s
+        s.commit()
+    except:
+        s.rollback()
+        raise
+    finally:
+        s.close()

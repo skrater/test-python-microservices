@@ -24,7 +24,3 @@ Por que replicar os dados nos micros serviços?
 * Retry de mensagens;
 * Publicar a mensagem para o Broker pode falhar, precisa implementar mecanismo de replay em cada serviço;
 * Controle de estado de um registro é complexo (ativo, inativo, saldo, etc)
-
-Os dados entre os serviço na minha opinião não está OK.
-Não acredito que seja certo o serviço de score receber dados de renda e patrimônio diretamente.
-Essas informações deveriam vir sempre a partir do Broker, e ele apenas calcular o score dessa informação.

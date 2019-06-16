@@ -1,4 +1,3 @@
-from topics import subscribe
 from sqlalchemy import event
 from db import get_session
 import json
@@ -9,20 +8,6 @@ from producer import send_message
 
 
 logger = logging.getLogger(__name__)
-
-
-@subscribe('person.new')
-def handle_new_person(payload):
-    logger.info(f'Received person.new: {payload}')
-
-    return True
-
-
-@subscribe('debt.new')
-def handle_new_debt(payload):
-    logger.info(f'Received debt.new: {payload}')
-
-    return True
 
 
 class EncoderJSON(json.JSONEncoder):

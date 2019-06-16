@@ -4,11 +4,7 @@ from db import get_session, session_scope
 import json
 import decimal
 from datetime import date
-from models import (person_schema, debt_schema,
-                    Person, Debt, Asset, Score,
-                    Income)
 from managers import ScoreManager
-from sqlalchemy.orm.exc import NoResultFound
 import logging
 from producer import send_message
 
@@ -16,52 +12,37 @@ from producer import send_message
 logger = logging.getLogger(__name__)
 
 
-@subscribe('person.new')
-def handle_new_person(payload):
-    logger.info(f'Received person.new: {payload}')
-
-    try:
-        loaded = person_schema.load(payload)
-    except ValidationError as err:
-        logger.exception('Invalid payload, ignoring message.')
-        return True
-
+def inc_score(score_type, payload):
     with session_scope() as s:
-        s.add(loaded.data)
+        cpf = payload['person']['cpf']
+        value = payload['value']
 
-    return True
+        ScoreManager.inc_score(s, cpf, score_type, value)
 
 
 @subscribe('debt.new')
 def handle_new_debt(payload):
     logger.info(f'Received debt.new: {payload}')
 
-    try:
-        loaded = person_schema.load(payload['person'])
-    except ValidationError as err:
-        logger.error('Invalid payload, ignoring message.')
-        return True
+    inc_score('debt', payload)
 
-    person = loaded.data
+    return True
 
-    try:
-        loaded = debt_schema.load(payload)
-    except ValidationError as err:
-        logger.error('Invalid payload, ignoring message.')
-        return True
 
-    with session_scope() as s:
-        debt = loaded.data
-        try:
-            person = s.query(Person).filter_by(cpf=person.cpf).one()
-        except NoResultFound:
-            logger.error('Person not found. Retrying...')
-            return False
+@subscribe('asset.new')
+def handle_new_asset(payload):
+    logger.info(f'Received asset.new: {payload}')
 
-        debt.person = person
-        debt.person_id = person.id
+    inc_score('asset', payload)
 
-        s.add(debt)
+    return True
+
+
+@subscribe('income.new')
+def handle_new_incoe(payload):
+    logger.info(f'Received income.new: {payload}')
+
+    inc_score('income', payload)
 
     return True
 
@@ -86,30 +67,3 @@ def receive_after_flush(session, flush_context):
         logger.info(f'Seding to RabbitMQ {obj}.')
 
         send_message(f'{obj.event_name}.new', obj.as_json)
-
-
-@event.listens_for(Debt, 'before_insert')
-def receive_before_insert_debt(mapper, connection, debt):
-    logger.info(f'After insert debt {debt}.')
-
-    @event.listens_for(get_session(), "after_flush", once=True)
-    def receive_after_flush(session, context):
-        ScoreManager.inc_score(session, debt.person, -(debt.value // 50))
-
-
-@event.listens_for(Asset, 'before_insert')
-def receive_before_insert_asset(mapper, connection, asset):
-    logger.info(f'After insert asset {asset}.')
-
-    @event.listens_for(get_session(), "after_flush", once=True)
-    def receive_after_flush(session, context):
-        ScoreManager.inc_score(session, asset.person, (asset.value // 20))
-
-
-@event.listens_for(Income, 'before_insert')
-def receive_before_insert_asset(mapper, connection, income):
-    logger.info(f'After insert income {income}.')
-
-    @event.listens_for(get_session(), "after_flush", once=True)
-    def receive_after_flush(session, context):
-        ScoreManager.inc_score(session, income.person, (income.value // 50))
