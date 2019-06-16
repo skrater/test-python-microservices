@@ -41,7 +41,7 @@ class ScoreManager:
         return 0
 
     @classmethod
-    def inc_score(cls, session, cpf, score_type, value):
+    def new_score(cls, cpf, score_type, value):
         score_value = cls.score_from_type(value, score_type)
 
         logger.info(f'Inc score to {cpf} by {score_value} from type {score_type} and value {value}')
@@ -52,4 +52,4 @@ class ScoreManager:
         score.value = value
         score.score = score_value
 
-        session.add(score)
+        return score

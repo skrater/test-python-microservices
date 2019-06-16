@@ -24,3 +24,37 @@ Por que replicar os dados nos micros serviços?
 * Retry de mensagens;
 * Publicar a mensagem para o Broker pode falhar, precisa implementar mecanismo de replay em cada serviço;
 * Controle de estado de um registro é complexo (ativo, inativo, saldo, etc)
+
+
+# Modo de usar
+
+```bash
+docker-compose up
+```
+
+## Curl
+
+### Inserir Person
+```bash
+curl -i -H 'Content-Type: application/json' http://localhost/person --data @payloads/new_person.json
+```
+
+### Inserir Income
+```bash
+curl -i -H 'Content-Type: application/json' http://localhost/11111/income --data @payloads/new_income.json
+```
+
+### Inserir Asset
+```bash
+curl -i -H 'Content-Type: application/json' http://localhost/11111/asset --data @payloads/new_asset.json
+```
+
+### Inserir Debt
+```bash
+curl -i -H 'Content-Type: application/json' http://localhost/11111/debt --data @payloads/new_debt.json
+```
+
+### Consultar Score
+```bash
+curl -i http://localhost:81/11111/score
+```

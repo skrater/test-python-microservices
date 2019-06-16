@@ -17,7 +17,9 @@ def inc_score(score_type, payload):
         cpf = payload['person']['cpf']
         value = payload['value']
 
-        ScoreManager.inc_score(s, cpf, score_type, value)
+        score = ScoreManager.new_score(cpf, score_type, value)
+
+        s.add(score)
 
 
 @subscribe('debt.new')
