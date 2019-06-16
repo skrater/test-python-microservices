@@ -23,7 +23,8 @@ Por que replicar os dados nos micros serviços?
 * Problemas de rede;
 * Retry de mensagens;
 * Publicar a mensagem para o Broker pode falhar, precisa implementar mecanismo de replay em cada serviço;
-* Controle de estado de um registro é complexo (ativo, inativo, saldo, etc)
+* Controle de estado de um registro é complexo (ativo, inativo, saldo, etc);
+* Precisa utilizar um service discover para chamar e proteger os enpoints dos serviços, particularmente usaria o Traefik;
 
 A implementação de Consumer e Producer do RabbitMQ está replicada em cada servico. Não é certo fazer isso.
 
@@ -43,25 +44,42 @@ docker-compose up
 
 ### Inserir Person
 ```bash
-curl -i -H 'Content-Type: application/json' http://localhost/person --data @payloads/new_person.json
+curl -i -H 'Content-Type: application/json' http://person.localhost/person --data @payloads/new_person.json
 ```
 
 ### Inserir Income
 ```bash
-curl -i -H 'Content-Type: application/json' http://localhost/person/11111/income --data @payloads/new_income.json
+curl -i -H 'Content-Type: application/json' http://person.localhost/person/11111/income --data @payloads/new_income.json
 ```
 
 ### Inserir Asset
 ```bash
-curl -i -H 'Content-Type: application/json' http://localhost/person/11111/asset --data @payloads/new_asset.json
+curl -i -H 'Content-Type: application/json' http://person.localhost/person/11111/asset --data @payloads/new_asset.json
 ```
 
 ### Inserir Debt
 ```bash
-curl -i -H 'Content-Type: application/json' http://localhost/person/11111/debt --data @payloads/new_debt.json
+curl -i -H 'Content-Type: application/json' http://person.localhost/person/11111/debt --data @payloads/new_debt.json
 ```
 
 ### Consultar Score
 ```bash
-curl -i http://localhost:81/11111/score
+curl -i http://score.localhost/11111/score
 ```
+
+
+## Componentes Utilizados
+
+* PostgreSQL
+* RabbitMQ
+* Python 3.7
+* Docker
+* Traefik
+
+### Python Libs
+
+[requirements.txt](requirements.txt)
+
+### Traefik
+
+http://admin:seguro@localhost:8080/dashboard/

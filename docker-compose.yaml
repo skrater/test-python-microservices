@@ -1,5 +1,16 @@
 version: '3'
 services:
+  app:
+    image: traefik:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./traefik.toml:/traefik.toml
+    networks:
+      - web
   person:
     build:
       context: .
@@ -10,14 +21,21 @@ services:
       AMQP_URL: "amqp://guest:guest@broker:5672/"
       AMQP_EXCHANGE: event_dispatcher
       AMQP_QUEUE: person
+    labels:
+      - traefik.backend=person
+      - traefik.frontend.rule=Host:person.localhost
+      - traefik.docker.network=web
+      - traefik.port=80
     depends_on:
+      - app
       - broker
       - db
     volumes:
      - ./person:/app
     hostname: person
-    ports:
-      - "80:80"
+    networks:
+      - internal
+      - web
   score:
     build:
       context: .
@@ -28,23 +46,44 @@ services:
       AMQP_URL: "amqp://guest:guest@broker:5672/"
       AMQP_EXCHANGE: event_dispatcher
       AMQP_QUEUE: score
+    labels:
+      - traefik.backend=score
+      - traefik.frontend.rule=Host:score.localhost
+      - traefik.docker.network=web
+      - traefik.port=80
     depends_on:
+      - app
       - broker
       - db_score
     volumes:
      - ./score:/app
     hostname: score
-    ports:
-      - "81:80"
+    networks:
+      - internal
+      - web
   db:
     image: postgres:latest
+    networks:
+      - internal
+      - web
     # ports:
     #   - "5432:5432"
   db_score:
     image: postgres:latest
     ports:
       - "5432:5432"
+    networks:
+      - internal
+      - web
   broker:
     image: rabbitmq:3.7-management
     ports:
       - "15672:15672"
+    networks:
+      - internal
+      - web
+networks:
+  web:
+    external: true
+  internal:
+    external: false
