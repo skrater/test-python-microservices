@@ -25,6 +25,13 @@ Por que replicar os dados nos micros serviços?
 * Publicar a mensagem para o Broker pode falhar, precisa implementar mecanismo de replay em cada serviço;
 * Controle de estado de um registro é complexo (ativo, inativo, saldo, etc)
 
+A implementação de Consumer e Producer do RabbitMQ está replicada em cada servico. Não é certo fazer isso.
+
+O ideal é criar uma abstração e reutilizar em outros serviços. Fiz assim porquê não encontrei uma lib em python que trabalhe assim.
+
+Não tem nenhum teste unitário também, não fiz porquê não estava com tempo para fazer, se fosse pra fazer, faria somente no score por enquanto,
+onde tem alguma lógica de negócio mais importante, o resto é praticamente código de infra.
+
 
 # Modo de usar
 
