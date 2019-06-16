@@ -4,6 +4,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import (Column, Integer, Float,
                         String, MetaData, ForeignKey,
                         DateTime, UniqueConstraint)
+from sqlalchemy.schema import Index
 from marshmallow import Schema, fields, ValidationError, post_load
 
 
@@ -65,6 +66,8 @@ class Debt(Base):
 
     person = relationship('Person', back_populates='debt')
 
+    __table_args__ = (Index('debt_person_id', "person_id"), )
+
     def __repr__(self):
         return f'<Debt(cpf={self.person.cpf},value={self.value})>'
 
@@ -102,6 +105,8 @@ class Asset(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
 
     person = relationship('Person', back_populates='asset')
+
+    __table_args__ = (Index('asset_person_id', "person_id"), )
 
     def __repr__(self):
         return f'<Asset(type={self.type},value={self.value})>'
@@ -142,6 +147,8 @@ class Income(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
 
     person = relationship('Person', back_populates='income')
+
+    __table_args__ = (Index('income_person_id', "person_id"), )
 
     def __repr__(self):
         return f'<Income(type={self.type},value={self.value})>'

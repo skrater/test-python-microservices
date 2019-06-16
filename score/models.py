@@ -3,6 +3,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import (Column, Integer, Float,
                         String, MetaData, ForeignKey,
                         DateTime)
+from sqlalchemy.schema import Index
 from marshmallow import Schema, fields, post_load
 
 
@@ -18,6 +19,8 @@ class Score(Base):
     value = Column(Float)
     score = Column(Integer, default=0)
     created_at = Column(DateTime, default=datetime.utcnow)
+
+    __table_args__ = (Index('score_cpf', "cpf"), )
 
     def __repr__(self):
         return f'<Score(score={self.score})>'
