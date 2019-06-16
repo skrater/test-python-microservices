@@ -14,11 +14,6 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__)
 
 
-@app.route('/')
-def hello():
-    return "Hello World!"
-
-
 @app.route('/person', methods=['POST'])
 def new_person():
     json_data = request.get_json()

@@ -11,11 +11,6 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__)
 
 
-@app.route('/')
-def hello():
-    return "Hello World!"
-
-
 @app.route('/<int:cpf>/score', methods=['GET'])
 def get_score(cpf):
     try:
