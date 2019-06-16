@@ -13,15 +13,34 @@ services:
     depends_on:
       - broker
       - db
-    links:
-     - db
-     - broker
     volumes:
      - ./person:/app
     hostname: person
     ports:
       - "80:80"
+  score:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: dockerize -wait tcp://broker:5672 -wait tcp://db_score:5432 -timeout 60s python main.py
+    environment:
+      RDBMS_URL: "postgres://postgres:postgres@db_score/postgres"
+      AMQP_URL: "amqp://guest:guest@broker:5672/"
+      AMQP_EXCHANGE: event_dispatcher
+      AMQP_QUEUE: score
+    depends_on:
+      - broker
+      - db_score
+    volumes:
+     - ./score:/app
+    hostname: score
+    ports:
+      - "81:80"
   db:
+    image: postgres:latest
+    # ports:
+    #   - "5432:5432"
+  db_score:
     image: postgres:latest
     ports:
       - "5432:5432"

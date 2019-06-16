@@ -1,5 +1,6 @@
 {
 	"cpf": 11111,
 	"name": "abc",
-	"address": "abc"
+	"address": "abc",
+	"date_of_birth": "2019-06-15T19:23:55-03:00"
 }

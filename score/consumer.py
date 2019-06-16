@@ -20,7 +20,6 @@ def process_event(body, message):
 
     if not success:
         logger.info(f'Failed to process topic {routing_key}. Requeue message.')
-
         message.reject(True)
         return
 

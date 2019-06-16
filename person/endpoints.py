@@ -4,6 +4,7 @@ from gevent.pywsgi import WSGIServer
 from models import Person, person_schema, debt_schema
 from flask import request, Response
 from sqlalchemy.orm.exc import NoResultFound
+from marshmallow import ValidationError
 from db import new_session
 
 

@@ -38,9 +38,10 @@ class EncoderJSON(json.JSONEncoder):
 
 @event.listens_for(get_session(), 'after_flush')
 def receive_after_flush(session, flush_context):
-    logger.info('After session flush.')
-
     for obj in session.new:
-        logger.info(f'Seding to amqp {obj}.')
+        if not obj.event_name:
+            continue
 
-        send_message(obj.event_name, obj.as_json)
+        logger.info(f'Seding to RabbitMQ {obj}.')
+
+        send_message(f'{obj.event_name}.new', obj.as_json)
