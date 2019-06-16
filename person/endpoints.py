@@ -33,7 +33,7 @@ def new_person():
     return jsonify({'message': 'created'}), 201
 
 
-@app.route('/<int:cpf>/debt', methods=['POST'])
+@app.route('/person/<int:cpf>/debt', methods=['POST'])
 def new_debt(cpf):
     json_data = request.get_json()
     if not json_data:
@@ -57,7 +57,7 @@ def new_debt(cpf):
     return jsonify({'message': 'created'}), 201
 
 
-@app.route('/<int:cpf>/asset', methods=['POST'])
+@app.route('/person/<int:cpf>/asset', methods=['POST'])
 def new_asset(cpf):
     json_data = request.get_json()
     if not json_data:
@@ -81,7 +81,7 @@ def new_asset(cpf):
     return jsonify({'message': 'created'}), 201
 
 
-@app.route('/<int:cpf>/income', methods=['POST'])
+@app.route('/person/<int:cpf>/income', methods=['POST'])
 def new_income(cpf):
     json_data = request.get_json()
     if not json_data:

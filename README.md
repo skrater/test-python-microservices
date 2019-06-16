@@ -48,17 +48,17 @@ curl -i -H 'Content-Type: application/json' http://localhost/person --data @payl
 
 ### Inserir Income
 ```bash
-curl -i -H 'Content-Type: application/json' http://localhost/11111/income --data @payloads/new_income.json
+curl -i -H 'Content-Type: application/json' http://localhost/person/11111/income --data @payloads/new_income.json
 ```
 
 ### Inserir Asset
 ```bash
-curl -i -H 'Content-Type: application/json' http://localhost/11111/asset --data @payloads/new_asset.json
+curl -i -H 'Content-Type: application/json' http://localhost/person/11111/asset --data @payloads/new_asset.json
 ```
 
 ### Inserir Debt
 ```bash
-curl -i -H 'Content-Type: application/json' http://localhost/11111/debt --data @payloads/new_debt.json
+curl -i -H 'Content-Type: application/json' http://localhost/person/11111/debt --data @payloads/new_debt.json
 ```
 
 ### Consultar Score
